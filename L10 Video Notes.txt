@@ -1,0 +1,59 @@
+L10 Video Notes
+
+This week we have Arduino and Python action!
+In fact, there is more Arduino action, but only because Python makes that side easy.
+
+This is an important lesson!
+What we do can now leave our PC and affect the real world. What power!
+
+Arduino
+
+    Receive an instruction from Python, but without blocking.
+    We have a millis() framework so we can hang another task on it.
+    What tasks? High level: Receive, parse, action.
+    Receive options:
+    1. Sit and wait. Rejected - this blocks and the nano has other jobs to do!
+    2. Poll for stuff - we could create another job for the millis() framework.
+    3. Background interrupt to check for stuff - a timer job, but I think too complex.
+    4. Use an Arduino function that exists just for this type of common ask... Yes!
+    Introducing serialEvent()...
+    An automatic task that, if it exists, is called after loop() if there is serial data.
+    It is essentially a timer task, but better, in that it is only called if necessary.
+    And best of all, all we have to do is create a function with the right name.
+    And have that function collect the serial data into a string for us to process.
+    Strings are a C abstraction and are really character arrays. This means pointers.
+    Pointers are the real power of C, but when used incorrectly bad things happen.
+    So, a heartbeat was the first new task (#9) I hung on my millis() framework.
+    Next, I needed a character array, or string, for my serial commands to go in.
+    This is a fixed size global array variable so that serialEvent() can use it.
+    Now serialEvent(). As data arrives it will be repeatedly called per command, so...
+    The command buffer index pointer must be preserved between calls with static.
+    After that read new characters and add them to the next position in the buffer...
+    Until the we read the end of command character, or the buffer is full.
+    Then we finish the string, set a flag to tell the main loop(), and reset the index.
+    In the main loop() another task (#5) has been hung on my millis() framework.
+    This task watches the cmd ready flag and uses the clever strtok() function.
+    Using strtok() we quickly parse out the command subject and action.
+    Finally we test if we have a recognised subject and an action, and do something.
+    Currently I have one subject which can action the values 0-7 to turn LEDs on/off.
+
+
+Python
+
+    Send an instruction to the Arduino.
+    I have 3 LEDs (BGR) connected to the Arduino and controlled with int values 0-7.
+    So I calculate which LED to light using the same idea as the bgrLEDBank().
+    I have a function that calculates bit 0 (1, blue), bit 1 (2, green), or bit 2 (4, red).
+    A command is then constructed, “bgrLEDs=X”, where X is the bitwise LED value.
+    Then an end of command “\n” is added to the command and it is transmitted.
+
+
+Key learnings
+
+    the Arduino function serialEvent() is designed for the job of receiving serial data.
+    The C function strtok() is designed for the job of parsing the command string.
+    A millis() framework makes it easy to add new tasks into the main loop().
+    Pointers are just variables that contain the memory addresses of other variables.
+    Char arrays and indexes can be easily used instead of the Arduino string class.
+
+EOF
