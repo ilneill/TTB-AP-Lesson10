@@ -2,7 +2,7 @@
 My Solution to Paul McWhorter's "Arduino with Python: LESSON 10" homework.
 
 Visit Paul's video here:
- - https://youtu.be/watch?v=tJw8JEX89eo
+ - https://youtu.be/watch?v=dbZZlq1_M4o
 
 You can get Paul's code here:
  - https://toptechboy.com/
